@@ -1,0 +1,386 @@
+<!doctype html>
+<!-- COMP6799 SQL practice, BlueJack-style: practice / exam / data / result -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hehe Groceries Practice</title>
+<style>
+:root{--blue:#4ca6dd;--blue2:#3b8fc4;--bg:#fff;--card:#f8f8f8;--ink:#1f2328;--mute:#6b7280;--ok:#3cb35a;--mid:#e0a020;--bad:#d64545;--line:#e5e7eb}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 -apple-system,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{position:sticky;top:0;z-index:20;background:var(--blue);color:#fff;display:flex;align-items:center;padding:0 20px;height:58px;box-shadow:0 2px 6px #0002}
+header a{color:#fff;text-decoration:none;padding:16px 16px;font-size:17px;border-bottom:3px solid transparent}header a.on{font-weight:700;border-bottom-color:#fff}
+header .clock{margin-left:auto;font-size:15px;white-space:nowrap}
+.who{margin-left:16px;font-size:15px}.who input{width:120px;padding:4px 8px;border:0;border-radius:5px;font:inherit}.sync{margin-left:8px;font-size:13px;opacity:.9;min-width:60px}
+.chip{display:inline-block;background:#a9d3ee;color:#fff;font-weight:700;padding:10px 20px;border-radius:6px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:24px 40px 8px;flex-wrap:wrap}
+.head h1{color:var(--blue);font-size:34px;margin:0}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:10px 20px;font:inherit;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{background:var(--blue2)}.btn.ghost{background:#fff;color:var(--blue2);border:1px solid var(--blue)}.btn.red{background:var(--bad)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.wrap{display:flex;gap:28px;padding:20px 24px}
+aside{width:250px;flex-shrink:0}
+.side{position:sticky;top:78px;background:var(--card);border-radius:10px;box-shadow:0 1px 6px #0001;padding:18px 16px;max-height:calc(100vh - 98px);overflow:auto}
+.timer{color:var(--blue);font-size:30px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}.timer.low{color:var(--bad)}
+.tbtn{display:flex;gap:6px;justify-content:center;margin:6px 0 12px;flex-wrap:wrap}.tbtn button{font-size:12px;padding:3px 10px;border:1px solid var(--line);background:#fff;border-radius:4px;cursor:pointer}
+.sl a{display:grid;grid-template-columns:34px 1fr auto;gap:4px;padding:3px 4px;color:var(--blue);text-decoration:none;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.sl a:hover{background:#eef6fc;border-radius:4px}.sl a.hide{display:none}
+.s{color:var(--mute)}.s.ok{color:var(--ok)}.s.mid{color:var(--mid)}.s.bad{color:var(--bad)}.b{color:var(--mute);font-weight:400}
+.total{font-size:22px;font-weight:700;margin-top:14px}.total small{display:block;font-size:13px;font-weight:400;color:var(--mute)}
+main{flex:1;min-width:0}
+.filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 20px}.filters select,.filters button{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer}
+.filters button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.erd{text-align:center;margin:0 0 24px}.erd img{max-width:100%;border-radius:6px}
+.card{background:var(--card);border-radius:10px;box-shadow:0 1px 6px #0001;padding:22px 26px;margin:0 0 30px;scroll-margin-top:80px}.card.hide{display:none}
+.qt{display:flex;gap:10px;font-size:18px}.qt .txt{white-space:pre-line}
+.tag{font-size:12px;color:var(--mute);margin:4px 0 0 30px}
+.funcs{font-weight:700;margin:12px 0 0 30px}
+.tools{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:6px 0 10px;font-weight:700}
+.tools input{width:90px;padding:6px 8px;border:2px solid #999;border-radius:6px;font:inherit}
+.ed{position:relative}
+.sqlbox,.hl{display:block;width:100%;min-height:150px;margin:0;padding:12px 14px;border:2px solid #7fc0e8;border-radius:8px;font:16px/1.55 ui-monospace,Menlo,monospace;tab-size:2;white-space:pre-wrap;overflow-wrap:anywhere;letter-spacing:0}
+.hl{position:absolute;inset:0;background:#fff;color:var(--ink);pointer-events:none;overflow:hidden}
+.sqlbox{position:relative;background:transparent;color:transparent;caret-color:var(--ink);resize:vertical;outline:none;overflow:hidden}
+.sqlbox::placeholder{color:#9aa1ad}.sqlbox::selection{background:#4ca6dd55}
+.k{color:#7a1fa2}.t{color:#1b7f5a}.f{color:#1f6fbf}.str{color:#b3261e}.num{color:#1b7f5a}.cm{color:#8a8f98;font-style:italic}
+.sqlbox:focus{border-color:var(--blue2);box-shadow:0 0 0 3px #4ca6dd33}
+.under{display:flex;align-items:center;justify-content:space-between;margin:14px 0;gap:10px;flex-wrap:wrap}.under .acts{display:flex;gap:8px;flex-wrap:wrap}
+.verdict{border-radius:8px;padding:10px 14px;margin:8px 0;font-weight:600}
+.verdict.ok{background:#e7f6eb;color:#23803d}.verdict.mid{background:#fdf3dc;color:#9a6a00}.verdict.bad{background:#fbe5e5;color:#b42323}
+.err{white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;font-size:14px;font-weight:400;margin-top:4px}
+.res{display:grid;grid-template-columns:110px 1fr;gap:12px;margin-top:12px}.res h4{margin:6px 0;font-size:19px}
+.tw{overflow:auto;max-height:420px;border-radius:10px;box-shadow:0 1px 4px #0002;background:#fff}
+table{border-collapse:collapse;min-width:100%;width:max-content}
+th{background:var(--blue);color:#fff;padding:12px 20px;font-weight:700;position:sticky;top:0}td{padding:10px 20px;text-align:center;border-bottom:1px solid #f0f0f0;white-space:nowrap}
+tr.miss td{background:#fdecec}
+.hintbox{background:#fff;border-left:4px solid var(--blue);padding:10px 14px;margin:8px 0;border-radius:4px;font-size:15px}
+pre.ans{background:#fff;border:1px solid var(--line);padding:12px;border-radius:8px;white-space:pre-wrap;font-size:14px;margin:6px 0}
+.view{display:none}.view.on{display:block}
+.panel{background:var(--card);border-radius:10px;box-shadow:0 1px 6px #0001;padding:22px 26px;margin:0 0 24px}
+.panel h2{margin:0 0 12px;color:var(--blue2);font-size:22px}
+.bar{height:10px;background:#e8eef3;border-radius:5px;overflow:hidden;min-width:140px}.bar i{display:block;height:100%;background:var(--ok)}
+.rt td{text-align:left}
+/* game feel: short, non-blocking */
+.verdict{position:relative;overflow:visible}
+.clear{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:800;letter-spacing:.06em;color:#fff;background:linear-gradient(90deg,#3cb35a,#2fa4d8);padding:4px 12px;border-radius:999px;font-size:14px;animation:clear 1.1s cubic-bezier(.2,1.4,.4,1) both;pointer-events:none}
+@keyframes clear{0%{opacity:0;transform:translateY(-50%) scale(.5)}25%{opacity:1;transform:translateY(-50%) scale(1.12)}40%{transform:translateY(-50%) scale(1)}100%{opacity:1;transform:translateY(-50%) scale(1)}}
+.gain{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:800;color:#b07a00;animation:gain .9s ease-out both;pointer-events:none}
+@keyframes gain{0%{opacity:0;transform:translateY(-20%)}30%{opacity:1}100%{opacity:0;transform:translateY(-160%)}}
+.verdict.ok.fx{animation:okglow .9s ease-out}
+@keyframes okglow{0%{box-shadow:0 0 0 0 #3cb35a88}100%{box-shadow:0 0 0 12px #3cb35a00}}
+.sl a.flash{animation:rowflash 1s ease-out}
+@keyframes rowflash{0%{background:#3cb35a33;transform:translateX(4px)}100%{background:transparent;transform:none}}
+.xp{margin-top:6px;height:10px;border-radius:5px;background:#e3eaf0;overflow:hidden}
+.xp i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4ca6dd,#3cb35a);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.rank{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.08em;padding:2px 8px;border-radius:999px;background:#e8f2fa;color:var(--blue2);vertical-align:middle;margin-left:6px}
+.total.maxed .rank{background:linear-gradient(90deg,#f5c542,#ffdf7e,#f5c542);background-size:200% 100%;color:#6b4a00;animation:shine 1.6s linear 1}
+.total.maxed .xp i{background:linear-gradient(90deg,#f5c542,#e8a317)}
+.total .num{display:inline-block}.total .num.bump{animation:bump .5s ease-out}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.25);color:var(--ok)}100%{transform:scale(1)}}
+@keyframes shine{0%{background-position:200% 0}100%{background-position:0 0}}
+@media (prefers-reduced-motion:reduce){.clear,.gain,.verdict.ok.fx,.sl a.flash,.total .num.bump,.total.maxed .rank{animation:none}.xp i{transition:none}}
+.sl a.soal{display:block;color:#fff;background:var(--blue);border-radius:6px;padding:6px 10px;margin-bottom:8px;text-align:center}
+.sl a.soal:hover{background:var(--blue2)}
+#erdview{position:fixed;inset:0;z-index:50;background:#0008;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:zoom-out;padding:16px}
+#erdview[hidden]{display:none}#erdview img{max-width:min(1100px,100%);max-height:85vh;background:#fff;border-radius:10px;box-shadow:0 10px 40px #0006}
+#erdview span{color:#fff;font-size:14px}
+.err,pre.ans{outline:none;cursor:text;user-select:text}.err:focus,pre.ans:focus{box-shadow:0 0 0 2px #4ca6dd66}
+.cases{display:flex;margin-right:10px;background:#ffffff26;border-radius:8px;padding:3px}.cases a{padding:8px 12px;border-radius:6px;border:0;font-size:15px}.cases a.on{background:#fff;color:var(--blue2);font-weight:700}
+@media (max-width:860px){.wrap{flex-direction:column;padding:12px 16px}aside{width:100%}.side{position:static;max-height:none}.head{margin:16px}.res{grid-template-columns:1fr}header{overflow-x:auto}header a{padding:16px 8px}header .clock{display:none}}
+</style></head><body>
+<div id="erdview" hidden onclick="this.hidden=true"><img class="erdimg" src="ERD.jpg" alt="ERD of the case database"><span>Click anywhere or press Esc to close</span></div>
+<header><span class="cases"><a href="?case=1#practice" id="case1">Case 1</a><a href="?case=2#practice" id="case2">Case 2</a></span><a href="#practice" data-v="practice">Practice</a><a href="#exam" data-v="exam">Exam</a><a href="#data" data-v="data">Data</a><a href="#result" data-v="result">Result</a><a href="notes.html">Notes</a><span class="clock" id="clock"></span><label class="who">👤 <input id="who" maxlength="50" title="Profile name — progress is saved on this server under this name"></label><span class="sync" id="sync"></span></header>
+<div style="padding:20px 24px 0"><span class="chip">COMP6799 · Database Technology</span></div>
+<div class="head"><h1 id="casetitle">Hehe Groceries</h1><a class="btn" id="dl" href="dump.sql" download="create+insert.sql">⬇ Download Case</a></div>
+<div class="wrap">
+  <aside><div class="side">
+    <div class="timer" id="timer">00:00:00</div>
+    <div class="tbtn" id="tctl"></div>
+    <div class="sl" id="sl"></div>
+    <div class="total" id="total"></div>
+  </div></aside>
+  <main>
+    <section class="view" id="v-practice">
+      <div class="filters"><b>Show:</b><button data-f="all" class="on">All</button><button data-f="todo">Not 100 yet</button><button data-f="hint">Used a hint</button>
+        <select id="topic"><option value="">All topics</option></select></div>
+      <div class="erd"><img class="erdimg" src="ERD.jpg" alt="ERD of the case database"></div>
+      <div id="cards-practice"></div>
+    </section>
+    <section class="view" id="v-exam">
+      <div class="panel" id="exam-intro"><h2>Exam mode</h2>
+        <p>20 random questions from the 50, with a 100-minute countdown. No hints, no expected results, no answers. Each question is scored when you click Run Query. When you finish (or time runs out), your score goes to the Result tab.</p>
+        <button class="btn" id="exam-start">Start exam</button></div>
+      <div class="erd" id="exam-erd" style="display:none"><img class="erdimg" src="ERD.jpg" alt="ERD of the case database"></div>
+      <div id="cards-exam"></div>
+    </section>
+    <section class="view" id="v-data"><div id="data"></div></section>
+    <section class="view" id="v-result"><div id="result"></div></section>
+  </main>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+// Case 1 = Hehe Groceries (course case), Case 2 = Buku Kita bookstore (transfer practice). Each case keeps its own keys.
+const CASE=new URLSearchParams(location.search).get('case')==='2'?2:1;
+const PK=k=>(CASE===2&&k!=='user'&&k!=='ts')?'c2:'+k:k;
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(PK(k)))??d}catch{return d}},set(k,v){try{localStorage.setItem(PK(k),JSON.stringify(v));if(k!=='user'){localStorage.setItem('ts',Date.now());sync()}}catch{}}};
+const esc=s=>s===null||s===undefined?'<i style="color:#999">NULL</i>':String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const api=(a,b)=>fetch('api.php?c='+CASE+'&a='+a,{method:'POST',body:JSON.stringify(b||{})}).then(r=>r.json());
+const TABLES={MsCategory:['CategoryID','CategoryName'],MsCustomer:['CustomerID','CustomerName','CustomerGender','CustomerAddress','CustomerEmail','CustomerDOB'],MsEmployee:['EmployeeID','EmployeeName','EmployeeGender','EmployeeAddress'],MsProduct:['ProductID','CategoryID','ProductName','ProductPrice','ProductStock'],TransactionHeader:['TransactionID','EmployeeID','CustomerID','TransactionDate'],TransactionDetail:['TransactionID','ProductID','Quantity']};
+const cls=s=>s===undefined||s===null?'':s===100?'ok':s>0?'mid':'bad';
+const group=t=>t.split(' · ')[0];
+let Q=[],view='practice',filter='all';
+const S={cur:store.get('cur',{}),best:store.get('best',{}),hint:store.get('hint',{}),log:store.get('log',[]),exams:store.get('exams',[]),exam:store.get('exam',null)};
+const save=k=>store.set(k,S[k]);
+(()=>{const c2=CASE===2;$('case'+CASE).classList.add('on');
+  $('casetitle').textContent=c2?'Buku Kita Bookstore':'Hehe Groceries';document.title=(c2?'Buku Kita':'Hehe Groceries')+' Practice';
+  $('dl').href=c2?'dump2.sql':'dump.sql';$('dl').download=c2?'buku_kita.sql':'create+insert.sql';
+  document.querySelectorAll('.erdimg').forEach(i=>i.src=c2?'ERD2.svg':'ERD.jpg');
+  document.querySelector('.chip').textContent=c2?'COMP6799 · Case 2 — transfer practice':'COMP6799 · Database Technology'})();
+const eds={practice:{},exam:{}};
+
+// ---- clock ----
+const tick=()=>$('clock').textContent=new Date().toLocaleString('en-US',{timeZone:'Asia/Jakarta',weekday:'short',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',second:'2-digit'})+' (Asia/Jakarta)';
+tick();setInterval(tick,1000);
+const fmt=s=>[s/3600,s/60%60,s%60].map(v=>String(Math.floor(Math.max(v,0))).padStart(2,'0')).join(':');
+
+// ---- practice stopwatch ----
+let tSec=store.get('tsec',0),tRun=false;
+setInterval(()=>{
+  if(view==='exam'&&S.exam&&!S.exam.done){const left=Math.round((S.exam.end-Date.now())/1000);$('timer').textContent=fmt(left);$('timer').classList.toggle('low',left<600);if(left<=0)finishExam();return}
+  $('timer').classList.remove('low');
+  if(tRun){tSec++;store.set('tsec',tSec)}if(view!=='exam')$('timer').textContent=fmt(tSec)},1000);
+
+// ---- sidebar ----
+function side(){
+  if(view==='exam'&&S.exam){
+    const e=S.exam;$('tctl').innerHTML=e.done?'':'<button id="efin">Finish exam</button>';
+    if($('efin'))$('efin').onclick=()=>{if(confirm('Finish the exam now?'))finishExam()};
+    if(e.done)$('timer').textContent='Finished';
+    $('sl').innerHTML=`<a class="soal" href="#" onclick="erd();return false">📋 Soal</a>`+e.qs.map((qi,k)=>`<a href="#x${k+1}" onclick="jump('x${k+1}');return false"><span>${k+1}.</span><span class="s ${cls(e.sc[k])}">${e.sc[k]??'–'}/100</span><span class="b">Q${qi+1}</span></a>`).join('');
+    showTotal(examScore(e),`${e.sc.filter(s=>s===100).length} / ${e.qs.length} cleared`);return}
+  $('tctl').innerHTML=`<button id="tgo">${tRun?'Pause':'Start'}</button><button id="treset">Reset</button>`;
+  $('tgo').onclick=()=>{if(!confirm(tRun?'Pause the timer?':'Start the timer?'))return;tRun=!tRun;side()};
+  $('treset').onclick=()=>{if(!confirm('Reset the timer to 00:00:00?'))return;tSec=0;store.set('tsec',0);$('timer').textContent=fmt(0)};
+  $('sl').innerHTML=Q.map((q,i)=>{const c=S.cur[i],b=S.best[i];
+    return (i?'':`<a class="soal" href="#" onclick="erd();return false">📋 Soal</a>`)+`<a href="#q${i+1}" data-i="${i}" onclick="jump('q${i+1}');return false"><span>${i+1}.</span><span class="s ${cls(c)}">${c??'–'}/100${S.hint[i]?' 💡':''}</span><span class="b">(${b??'–'})</span></a>`}).join('');
+  const bs=Object.values(S.best),res=Math.round(bs.reduce((a,b)=>a+b,0)/Q.length),full=bs.filter(s=>s===100).length;
+  showTotal(res,`${full} / ${Q.length} cleared`);
+  applyFilter()}
+const RANKS=[[100,'MAXED'],[75,'MASTER'],[50,'PRO'],[25,'APPRENTICE'],[0,'ROOKIE']];
+let lastTotal=null;
+function showTotal(v,sub){
+  const el=$('total'),rank=RANKS.find(r=>v>=r[0])[1];
+  if(!el.querySelector('.num'))el.innerHTML='Result : <span class="num">0</span><span class="rank"></span><div class="xp"><i></i></div><small></small>';
+  const num=el.querySelector('.num'),from=lastTotal??v;
+  el.querySelector('.rank').textContent=rank;el.querySelector('small').textContent=sub;
+  el.querySelector('.xp i').style.width=v+'%';el.classList.toggle('maxed',v===100);
+  if(from!==v&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
+    const t0=performance.now();num.classList.remove('bump');void num.offsetWidth;if(v>from)num.classList.add('bump');
+    const step=t=>{const k=Math.min(1,(t-t0)/450);num.textContent=Math.round(from+(v-from)*k);if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+  else num.textContent=v;
+  lastTotal=v}
+function celebrate(mode,i,s,prev){
+  const v=document.querySelector(`#out-${mode}-${i} .verdict`);if(!v)return;
+  if(s===100){v.classList.add('fx');v.insertAdjacentHTML('beforeend',`<span class="clear">${prev===100?'CLEAR ✓':'LEVEL CLEAR +'+(100-(prev||0))}</span>`);
+    const a=document.querySelector(`#sl a[data-i="${i}"]`)||[...document.querySelectorAll('#sl a')].find(x=>x.getAttribute('href')==='#x'+(S.exam?S.exam.qs.indexOf(i)+1:0));
+    if(a){a.classList.remove('flash');void a.offsetWidth;a.classList.add('flash')}}
+  else if(s>(prev||0))v.insertAdjacentHTML('beforeend',`<span class="gain">+${s-(prev||0)}</span>`)}
+function erd(){const o=$('erdview');o.hidden=!o.hidden}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('erdview').hidden=true;
+  // Cmd/Ctrl+A inside an error or answer box selects only that box
+  const a=document.activeElement;
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='a'&&a&&a.matches('.err,pre.ans')){e.preventDefault();const r=document.createRange();r.selectNodeContents(a);const sel=getSelection();sel.removeAllRanges();sel.addRange(r)}});
+document.addEventListener('mousedown',e=>{const b=e.target.closest('.err,pre.ans');if(b)b.focus()});
+function jump(id){const el=$(id);if(el){el.classList.remove('hide');el.scrollIntoView({behavior:'smooth'})}}
+
+// ---- cards ----
+function table(set,miss){if(!set)return '';
+  return `<div class="tw"><table><tr>${set.cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr>${set.rows.map((r,k)=>`<tr class="${miss&&miss.has(k)?'miss':''}">${r.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</table></div>`}
+function card(i,mode,k){const q=Q[i],id=mode==='exam'?'x'+(k+1):'q'+(i+1),n=mode==='exam'?k+1:i+1;
+  return `<section class="card" id="${id}" data-i="${i}">
+    <div class="qt"><span>${n}.</span><span class="txt">${esc(q.text)}</span></div>
+    ${mode==='exam'?'':`<div class="tag">${esc(q.topic)}</div>`}
+    <div class="funcs">(${esc(q.hint)})</div>
+    <div class="tools">Text Size <input type="number" min="10" max="30" placeholder="16" data-m="${mode}" data-i="${i}" class="ts"></div>
+    <div class="ed"><pre class="hl" id="hl-${mode}-${i}" aria-hidden="true"></pre><textarea class="sqlbox" id="ed-${mode}-${i}" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" placeholder="Type your query here.  Shift+Enter or Cmd+Enter = Run"></textarea></div>
+    <div class="under"><span>Query Length: <b id="len-${mode}-${i}">0</b> / 2000</span>
+      <span class="acts">${mode==='exam'?'':`<button class="btn ghost" data-a="sk" data-i="${i}" id="bsk-${i}">Hint: skeleton</button><button class="btn ghost" data-a="ans" data-i="${i}" id="bans-${i}">Show Answer</button>`}
+      <button class="btn" data-a="run" data-m="${mode}" data-i="${i}" data-k="${k??''}">Run Query</button></span></div>
+    <div id="help-${mode}-${i}"></div><div id="out-${mode}-${i}"></div></section>`}
+function mount(mode,list){
+  const box=$('cards-'+mode);box.innerHTML=list.map((i,k)=>card(i,mode,k)).join('');eds[mode]={};
+  list.forEach(i=>{const key=(mode==='exam'?'exdraft':'draft')+i,ta=$(`ed-${mode}-${i}`),len=$(`len-${mode}-${i}`);
+    const hl=$(`hl-${mode}-${i}`);
+    const grow=()=>{hl.innerHTML=paint(ta.value)+'\n';ta.style.height='auto';ta.style.height=Math.max(150,ta.scrollHeight+4)+'px'};
+    ta.value=store.get(key,'');len.textContent=ta.value.length;
+    let t;ta.oninput=()=>{len.textContent=ta.value.length;grow();clearTimeout(t);t=setTimeout(()=>store.set(key,ta.value),300)};
+    const U={stack:[{v:ta.value,s:0,e:0}],pos:0},snap=()=>{const t=U.stack[U.pos];if(t.v===ta.value)return;U.stack=U.stack.slice(0,U.pos+1);U.stack.push({v:ta.value,s:ta.selectionStart,e:ta.selectionEnd});U.pos++};
+    const go=d=>{if(d<0)snap();const n=U.pos+d;if(n<0||n>=U.stack.length)return;U.pos=n;const t=U.stack[n];ta.value=t.v;ta.setSelectionRange(t.s,t.e);len.textContent=ta.value.length;grow();store.set(key,ta.value)};
+    let last='';   // undo step = one word; a run of deletes = one step
+    ta.addEventListener('beforeinput',e=>{const t=e.inputType;
+      if(t==='historyUndo'||t==='historyRedo'){e.preventDefault();return}
+      const del=t.startsWith('delete');
+      if(t==='insertText'?(e.data&&!/\w/.test(e.data)&&last!=='sep'):del?last!=='del':true)snap();
+      last=del?'del':(t==='insertText'&&e.data&&!/\w/.test(e.data))?'sep':'word'});
+    ta.onkeydown=e=>{
+      const mod=e.metaKey||e.ctrlKey,z=e.key.toLowerCase();
+      if(mod&&z==='z'){e.preventDefault();go(e.shiftKey?1:-1);return}
+      if(mod&&z==='y'){e.preventDefault();go(1);return}
+      // Ctrl+Backspace / Ctrl+Delete: delete a whole word (Option+Backspace already does this on Mac)
+      if(e.ctrlKey&&!e.metaKey&&(e.key==='Backspace'||e.key==='Delete')&&ta.selectionStart===ta.selectionEnd){
+        e.preventDefault();const v=ta.value,p=ta.selectionStart;
+        if(e.key==='Backspace'){const m=v.slice(0,p).match(/(\w+|[^\w\s]+)?\s*$/);ta.setSelectionRange(p-(m[0].length||1),p)}
+        else{const m=v.slice(p).match(/^\s*(\w+|[^\w\s]+)?/);ta.setSelectionRange(p,p+(m[0].length||1))}
+        snap();document.execCommand('delete');snap();last='';return}
+      if(e.key==='Enter'&&(e.metaKey||e.ctrlKey||e.shiftKey)){e.preventDefault();run(mode,i);return}
+      if(e.key==='Tab'&&!e.shiftKey){e.preventDefault();document.execCommand('insertText',false,'  ')}};
+    ta.onblur=()=>store.set(key,ta.value);
+    if(mode==='exam'&&S.exam.done)ta.readOnly=true;
+    requestAnimationFrame(grow);
+    eds[mode][i]={getValue:()=>ta.value,setValue:v=>{ta.value=v;ta.oninput()},focus:()=>ta.focus(),setOption:(k,v)=>{if(k==='readOnly')ta.readOnly=v}}});
+  box.querySelectorAll('.ts').forEach(t=>t.oninput=()=>{const f=(t.value||16)+'px';$(`ed-${t.dataset.m}-${t.dataset.i}`).style.fontSize=f;$(`hl-${t.dataset.m}-${t.dataset.i}`).style.fontSize=f;$(`ed-${t.dataset.m}-${t.dataset.i}`).oninput()});
+  box.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;
+    if(b.dataset.a==='run')run(b.dataset.m,i);else if(b.dataset.a==='sk')sk(i);else ans(i)})}
+function missRows(y,e){if(!e)return null;const key=r=>JSON.stringify(r.map(v=>v==null?null:String(v))),left={};
+  e.rows.forEach(r=>left[key(r)]=(left[key(r)]||0)+1);const m=new Set();y.rows.forEach((r,k)=>{if(left[key(r)]>0)left[key(r)]--;else m.add(k)});return m}
+
+async function run(mode,i){
+  if(mode==='exam'&&S.exam.done)return;
+  const sql=eds[mode][i].getValue();if(sql.length>2000){alert('Query is longer than 2000 characters.');return}
+  if(!sql.trim()){alert('Write a query first.');return}
+  const out=$(`out-${mode}-${i}`);out.innerHTML='<div class="verdict mid">Running…</div>';
+  const r=await api('submit',{i,sql}),s=r.score??0,prev=mode==='exam'?S.exam.sc[S.exam.qs.indexOf(i)]:S.best[i];
+  S.log.unshift({t:Date.now(),i,s,m:mode});S.log=S.log.slice(0,300);save('log');
+  if(mode==='exam'){const k=S.exam.qs.indexOf(i);S.exam.sc[k]=s;save('exam')}
+  else{S.cur[i]=s;S.best[i]=Math.max(S.best[i]??0,s);save('cur');save('best')}
+  side();
+  const mine=r.you&&(r.you.check||r.you.result);
+  let h=`<div class="verdict ${cls(s)}">Score ${s}/100 — ${r.error?'Error':esc(r.why)}${r.error?`<div class="err" tabindex="0">${esc(r.error)}</div>`:''}</div>`;
+  if(mine)h+=`<div class="res"><h4>Result</h4>${table(mine,mode==='exam'?null:missRows(mine,r.expected))}</div>`;
+  else if(!r.error)h+=`<div class="res"><h4>Result</h4><div>Query OK, no table returned.</div></div>`;
+  if(mode!=='exam'&&s<100&&r.expected)h+=`<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--blue2)">Show expected result</summary><div class="res"><h4>Expected</h4>${table(r.expected)}</div></details>`;
+  out.innerHTML=h;celebrate(mode,i,s,prev)}
+// Syntax colors for the layer behind the text box (typing stays native).
+const KW=new Set('SELECT FROM WHERE JOIN LEFT RIGHT INNER OUTER ON AS AND OR NOT IN IS NULL LIKE BETWEEN GROUP BY ORDER HAVING LIMIT DISTINCT UNION ALL INSERT INTO VALUES UPDATE SET DELETE CREATE TABLE VIEW INDEX UNIQUE TEMPORARY DROP ALTER ADD MODIFY CHANGE COLUMN CONSTRAINT PRIMARY KEY FOREIGN REFERENCES CASCADE CHECK REGEXP DEFAULT IF EXISTS DATABASE USE CASE WHEN THEN ELSE END ASC DESC INTERVAL SEPARATOR START TRANSACTION COMMIT ROLLBACK GRANT REVOKE TO RENAME DAY MONTH YEAR'.split(' '));
+const TY=new Set('CHAR VARCHAR INT INTEGER FLOAT DECIMAL DATE DATETIME TEXT UNSIGNED'.split(' '));
+const paint=src=>src.replace(/(--[^\n]*)|('(?:[^'\\]|\\.)*'?)|(`[^`]*`?)|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b(?=\s*\()|\b([A-Za-z_]\w*)\b|([&<>])/g,
+  (m,cm,str,bt,num,fn,w,ch)=>{if(ch)return {'&':'&amp;','<':'&lt;','>':'&gt;'}[ch];
+    const e=x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if(cm)return `<span class="cm">${e(cm)}</span>`;if(str)return `<span class="str">${e(str)}</span>`;if(bt)return e(bt);
+    if(num)return `<span class="num">${num}</span>`;
+    const u=(fn||w).toUpperCase();if(TY.has(u))return `<span class="t">${fn||w}</span>`;if(KW.has(u))return `<span class="k">${fn||w}</span>`;
+    if(fn)return `<span class="f">${fn}</span>`;return w});
+
+// Pretty-print SQL: clauses on their own lines, top-level commas split, AND/OR indented.
+function fmtSQL(sql){
+  const BR=['SELECT','FROM','LEFT JOIN','RIGHT JOIN','INNER JOIN','JOIN','WHERE','GROUP BY','HAVING','ORDER BY','LIMIT','UNION ALL','UNION','SET','VALUES','ON UPDATE','ON DELETE'];
+  let out='',depth=0,q=null,inSelect=false,between=false;
+  for(let k=0;k<sql.length;k++){const c=sql[k];
+    if(q){out+=c;if(c===q)q=null;continue}
+    if(c==="'"||c==='`'){q=c;out+=c;continue}
+    // CREATE TABLE: one column/constraint per line inside the outer parentheses
+    if(/^CREATE\s+(TEMPORARY\s+)?TABLE\b/i.test(out.split(';').pop().trimStart())&&!/\bAS\s+SELECT/i.test(sql)){
+      if(c==='('&&depth===0){depth++;out=out.replace(/\s+$/,'')+' (\n  ';while(sql[k+1]===' ')k++;continue}
+      if(c===','&&depth===1){out+=',\n  ';while(sql[k+1]===' ')k++;continue}
+      if(c===')'&&depth===1){depth--;out=out.replace(/\s+$/,'')+'\n)';continue}}
+    if(c==='(')depth++;if(c===')')depth--;
+    if(depth===0){
+      const rest=sql.slice(k),kw=BR.find(w=>new RegExp('^'+w.replace(' ','\\s+')+'\\b','i').test(rest)&&!/\w/.test(sql[k-1]||''));
+      if(kw&&!(kw.startsWith('ON ')&&depth)){const m=rest.match(new RegExp('^'+kw.replace(' ','\\s+'),'i'))[0];
+        out=out.replace(/\s+$/,'')+(out?'\n':'')+m.toUpperCase().replace(/\s+/,' ');k+=m.length-1;inSelect=['SELECT','SET','VALUES'].includes(kw);between=false;
+        if(['SELECT','SET','VALUES'].includes(kw))out+='\n  ';else out+=' ';while(sql[k+1]===' ')k++;continue}
+      if(/^BETWEEN\b/i.test(rest)&&!/\w/.test(sql[k-1]||''))between=true;
+      if(/^(AND|OR)\b/i.test(rest)&&/\s/.test(sql[k-1]||'')&&between&&/^AND/i.test(rest)){between=false}
+      else if(/^(AND|OR)\b/i.test(rest)&&/\s/.test(sql[k-1]||'')){out=out.replace(/\s+$/,'')+'\n  '+rest.slice(0,rest.match(/^(AND|OR)/i)[0].length).toUpperCase();k+=rest.match(/^(AND|OR)/i)[0].length-1;continue}
+      if(c===','&&inSelect){out+=',\n  ';while(sql[k+1]===' ')k++;continue}
+      if(c===';'){out+=';\n\n';while(/\s/.test(sql[k+1]||''))k++;continue}}
+    out+=c}
+  return out.trim()}
+const codeBox=sql=>`<pre class="ans" tabindex="0">${paint(fmtSQL(sql))}</pre>`;
+
+// Skeleton / answer: one click shows, the same click hides. No pop-ups.
+const helpOpen={};
+async function toggleHelp(i,kind){
+  const box=$(`help-practice-${i}`);
+  $(`bsk-${i}`).textContent='Hint: skeleton';$(`bans-${i}`).textContent='Show Answer';
+  if(helpOpen[i]===kind){helpOpen[i]=null;box.innerHTML='';return}
+  helpOpen[i]=kind;S.hint[i]=1;save('hint');side();
+  const r=await api(kind==='sk'?'skeleton':'answer',{i});
+  if(helpOpen[i]!==kind)return;
+  box.innerHTML=kind==='sk'
+    ?`<div class="hintbox">Skeleton: fill in every ___ and '…'.</div>${codeBox(r.sk)}`
+    :`<div class="hintbox">Answer. Hide it, then type it from memory.</div>${codeBox(r.ref)}`;
+  $(kind==='sk'?`bsk-${i}`:`bans-${i}`).textContent=kind==='sk'?'Hide skeleton':'Hide Answer'}
+const sk=i=>toggleHelp(i,'sk'),ans=i=>toggleHelp(i,'ans');
+
+// ---- practice filters ----
+document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{filter=b.dataset.f;document.querySelectorAll('[data-f]').forEach(x=>x.classList.toggle('on',x===b));applyFilter()});
+$('topic').onchange=applyFilter;
+function shown(i){const t=$('topic').value;if(t&&group(Q[i].topic)!==t)return false;
+  if(filter==='todo')return S.best[i]!==100;if(filter==='hint')return !!S.hint[i];return true}
+function applyFilter(){if(view!=='practice')return;
+  document.querySelectorAll('#cards-practice .card').forEach(c=>c.classList.toggle('hide',!shown(+c.dataset.i)));
+  document.querySelectorAll('#sl a[data-i]').forEach(a=>a.classList.toggle('hide',!shown(+a.dataset.i)))}
+
+// ---- exam ----
+$('exam-start').onclick=()=>{
+  if(S.exam&&!S.exam.done&&!confirm('An exam is running. Start a new one?'))return;
+  const all=Q.map((_,i)=>i);for(let j=all.length-1;j>0;j--){const r=Math.floor(Math.random()*(j+1));[all[j],all[r]]=[all[r],all[j]]}
+  const qs=all.slice(0,20).sort((a,b)=>a-b);qs.forEach(i=>store.set('exdraft'+i,''));
+  S.exam={qs,sc:qs.map(()=>null),start:Date.now(),end:Date.now()+100*60*1000,done:false};save('exam');showExam()};
+function showExam(){const e=S.exam;
+  $('exam-intro').innerHTML=e.done?`<h2>Exam finished — score ${examScore(e)}</h2><p>Your answers are locked. See the Result tab for history.</p><button class="btn" id="exam-start2">Start a new exam</button>`
+    :`<h2>Exam running</h2><p>Answer the 20 questions below. Run Query scores a question. Finish with the button in the sidebar.</p>`;
+  if($('exam-start2'))$('exam-start2').onclick=()=>{S.exam.done=true;$('exam-start').click()};
+  $('exam-erd').style.display='';mount('exam',e.qs);side()}
+const examScore=e=>Math.round(e.sc.reduce((a,b)=>a+(b||0),0)/e.qs.length);
+function finishExam(){const e=S.exam;if(!e||e.done)return;e.done=true;
+  S.exams.unshift({t:Date.now(),score:examScore(e),full:e.sc.filter(s=>s===100).length,mins:Math.round((Math.min(Date.now(),e.end)-e.start)/60000),miss:e.qs.filter((q,k)=>e.sc[k]!==100).map(q=>q+1)});
+  save('exam');save('exams');Object.values(eds.exam).forEach(ed=>ed.setOption('readOnly',true));showExam()}
+
+// ---- data ----
+let dataDone=false;
+async function showData(){if(dataDone)return;dataDone=true;$('data').innerHTML='<div class="panel">Loading…</div>';
+  const d=await api('tables');$('data').innerHTML=Object.entries(d).map(([t,set])=>`<div class="panel"><h2>${t} <small style="color:var(--mute);font-size:14px">${set.rows.length} rows</small></h2>${table(set)}</div>`).join('')}
+
+// ---- result ----
+function showResult(){
+  const groups={};Q.forEach((q,i)=>{const g=group(q.topic);(groups[g]=groups[g]||[]).push(i)});
+  const rows=Object.entries(groups).map(([g,is])=>{const done=is.filter(i=>S.best[i]===100).length,p=Math.round(100*done/is.length);
+    return `<tr><td>${esc(g)}</td><td>${done} / ${is.length}</td><td><div class="bar"><i style="width:${p}%"></i></div></td><td>${is.filter(i=>S.best[i]!==100).map(i=>`<a href="#q${i+1}" onclick="go('practice');setTimeout(()=>jump('q${i+1}'),50);return false">Q${i+1}</a>`).join(' ')||'✓'}</td></tr>`}).join('');
+  const ex=S.exams.map(e=>`<tr><td>${new Date(e.t).toLocaleString('en-GB',{timeZone:'Asia/Jakarta'})}</td><td><b class="s ${cls(e.score)}">${e.score}</b></td><td>${e.full} / 20</td><td>${e.mins} min</td><td>${e.miss.map(n=>'Q'+n).join(' ')||'—'}</td></tr>`).join('');
+  const lg=S.log.slice(0,40).map(l=>`<tr><td>${new Date(l.t).toLocaleString('en-GB',{timeZone:'Asia/Jakarta'})}</td><td>${l.m}</td><td>Q${l.i+1} · ${esc(Q[l.i].topic)}</td><td><b class="s ${cls(l.s)}">${l.s}</b></td></tr>`).join('');
+  $('result').innerHTML=`<div class="panel"><h2>Mastery by topic</h2><div class="tw"><table class="rt"><tr><th>Topic</th><th>At 100</th><th>Progress</th><th>Still to do</th></tr>${rows}</table></div></div>
+    <div class="panel"><h2>Exam history</h2>${ex?`<div class="tw"><table class="rt"><tr><th>When</th><th>Score</th><th>Full marks</th><th>Time</th><th>Missed</th></tr>${ex}</table></div>`:'No exams yet. Open the Exam tab.'}</div>
+    <div class="panel"><h2>Last 40 attempts</h2>${lg?`<div class="tw"><table class="rt"><tr><th>When</th><th>Mode</th><th>Question</th><th>Score</th></tr>${lg}</table></div>`:'No attempts yet.'}</div>
+    <div class="panel"><button class="btn red" id="wipe">Reset all practice scores and history</button></div>`;
+  $('wipe').onclick=()=>{if(!confirm('Delete all scores, hints, history and exams?'))return;
+    ['cur','best','hint'].forEach(k=>S[k]={});S.log=[];S.exams=[];S.exam=null;['cur','best','hint','log','exams','exam'].forEach(save);showResult()}}
+
+// ---- views ----
+function go(v){view=v;history.replaceState(null,'','#'+v);
+  document.querySelectorAll('header a[data-v]').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
+  if(v==='exam'&&S.exam)showExam();if(v==='data')showData();if(v==='result')showResult();
+  document.querySelector('aside').style.display=(v==='data'||v==='result'||(v==='exam'&&!S.exam))?'none':'';
+  if(v!=='exam')$('timer').textContent=fmt(tSec);side()}
+document.querySelectorAll('header a[data-v]').forEach(a=>a.onclick=e=>{e.preventDefault();go(a.dataset.v)});
+
+// ---- server save (profile) ----
+let syncT;
+function snapshot(){const d={};for(let j=0;j<localStorage.length;j++){const k=localStorage.key(j);if(k!=='user')d[k]=localStorage.getItem(k)}return d}
+function sync(){clearTimeout(syncT);$('sync').textContent='saving…';syncT=setTimeout(pushNow,600)}
+async function pushNow(){syncT=null;const ts=+localStorage.getItem('ts');if(!ts)return;try{const r=await api('save',{user:USER,data:snapshot(),ts});$('sync').textContent=r.ok!==false?'✓ saved':'⚠ not saved'}catch{$('sync').textContent='⚠ offline'}}
+window.addEventListener('pagehide',()=>{const ts=+localStorage.getItem('ts');if(syncT&&ts){clearTimeout(syncT);navigator.sendBeacon('api.php?a=save',JSON.stringify({user:USER,data:snapshot(),ts}))}});
+const USER=store.get('user','student');$('who').value=USER;
+$('who').onchange=()=>{const u=$('who').value.trim()||'student';if(u===USER)return;
+  const keep={};localStorage.clear();localStorage.setItem('user',JSON.stringify(u));location.reload()};
+async function loadProfile(){
+  const r=await api('load',{user:USER}),local=+localStorage.getItem('ts')||0;
+  if(r.data&&r.ts>local){Object.entries(r.data).forEach(([k,v])=>localStorage.setItem(k,v));localStorage.setItem('ts',r.ts);location.reload();return false}
+  if(!local&&localStorage.length>1)localStorage.setItem('ts',Date.now());
+  if((+localStorage.getItem('ts')||0)>r.ts)await pushNow();else $('sync').textContent='✓ saved';
+  return true}
+
+loadProfile().then(ok=>ok&&api('list').then(d=>{Q=d;
+  [...new Set(Q.map(q=>group(q.topic)))].forEach(g=>$('topic').insertAdjacentHTML('beforeend',`<option>${esc(g)}</option>`));
+  mount('practice',Q.map((_,i)=>i));
+  go(['practice','exam','data','result'].includes(location.hash.slice(1))?location.hash.slice(1):'practice')}));
+</script></body></html>

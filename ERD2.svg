@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 600" font-family="Helvetica,Arial,sans-serif" font-size="13">
+<rect width="1040" height="600" fill="#fff"/>
+<line x1="300" y1="99.0" x2="390" y2="99.0" stroke="#333" stroke-dasharray="6 4"/>
+<circle cx="384" cy="99.0" r="4" fill="#fff" stroke="#333"/>
+<line x1="650" y1="99.0" x2="740" y2="121.0" stroke="#333" stroke-dasharray="6 4"/>
+<circle cx="734" cy="121.0" r="4" fill="#fff" stroke="#333"/>
+<line x1="520.0" y1="158" x2="520.0" y2="250" stroke="#333" stroke-dasharray="6 4"/>
+<circle cx="520.0" cy="244" r="4" fill="#fff" stroke="#333"/>
+<line x1="520.0" y1="346" x2="520.0" y2="430" stroke="#333" stroke-dasharray="6 4"/>
+<circle cx="520.0" cy="424" r="4" fill="#fff" stroke="#333"/>
+<line x1="650" y1="500.0" x2="740" y2="467.0" stroke="#333" stroke-dasharray="6 4"/>
+<circle cx="734" cy="467.0" r="4" fill="#fff" stroke="#333"/>
+<rect x="40" y="40" width="260" height="118" rx="10" fill="#f2b97a" stroke="#333"/>
+<text x="170.0" y="56" text-anchor="middle" fill="#222">msstaff</text><line x1="40" y1="64" x2="300" y2="64" stroke="#333"/>
+<text x="50" y="80" font-size="11">🔑</text><text x="80" y="80" font-weight="bold">StaffID</text><text x="205" y="80" fill="#333">char(5)</text>
+<text x="50" y="102" font-size="11">▤</text><text x="80" y="102">StaffName</text><text x="205" y="102" fill="#333">varchar(50)</text>
+<text x="50" y="124" font-size="11">▤</text><text x="80" y="124">StaffGender</text><text x="205" y="124" fill="#333">varchar(10)</text>
+<text x="50" y="146" font-size="11">▤</text><text x="80" y="146">StaffAddress</text><text x="205" y="146" fill="#333">varchar(50)</text>
+<rect x="390" y="40" width="260" height="118" rx="10" fill="#f2b97a" stroke="#333"/>
+<text x="520.0" y="56" text-anchor="middle" fill="#222">salesheader</text><line x1="390" y1="64" x2="650" y2="64" stroke="#333"/>
+<text x="400" y="80" font-size="11">🔑</text><text x="430" y="80" font-weight="bold">SaleID</text><text x="555" y="80" fill="#333">char(5)</text>
+<text x="400" y="102" font-size="11">↗</text><text x="430" y="102" font-style="italic">StaffID</text><text x="555" y="102" font-style="italic" fill="#333">char(5)</text>
+<text x="400" y="124" font-size="11">↗</text><text x="430" y="124" font-style="italic">MemberID</text><text x="555" y="124" font-style="italic" fill="#333">char(5)</text>
+<text x="400" y="146" font-size="11">▤</text><text x="430" y="146">SaleDate</text><text x="555" y="146" fill="#333">date</text>
+<rect x="740" y="40" width="260" height="162" rx="10" fill="#f2b97a" stroke="#333"/>
+<text x="870.0" y="56" text-anchor="middle" fill="#222">msmember</text><line x1="740" y1="64" x2="1000" y2="64" stroke="#333"/>
+<text x="750" y="80" font-size="11">🔑</text><text x="780" y="80" font-weight="bold">MemberID</text><text x="905" y="80" fill="#333">char(5)</text>
+<text x="750" y="102" font-size="11">▤</text><text x="780" y="102">MemberName</text><text x="905" y="102" fill="#333">varchar(50)</text>
+<text x="750" y="124" font-size="11">▤</text><text x="780" y="124">MemberGender</text><text x="905" y="124" fill="#333">varchar(10)</text>
+<text x="750" y="146" font-size="11">▤</text><text x="780" y="146">MemberAddress</text><text x="905" y="146" fill="#333">varchar(50)</text>
+<text x="750" y="168" font-size="11">▤</text><text x="780" y="168">MemberEmail</text><text x="905" y="168" fill="#333">varchar(50)</text>
+<text x="750" y="190" font-size="11">▤</text><text x="780" y="190">MemberDOB</text><text x="905" y="190" fill="#333">date</text>
+<rect x="390" y="250" width="260" height="96" rx="10" fill="#f2b97a" stroke="#333"/>
+<text x="520.0" y="266" text-anchor="middle" fill="#222">salesdetail</text><line x1="390" y1="274" x2="650" y2="274" stroke="#333"/>
+<text x="400" y="290" font-size="11">🔑↗</text><text x="430" y="290" font-weight="bold" font-style="italic">SaleID</text><text x="555" y="290" font-style="italic" fill="#333">char(5)</text>
+<text x="400" y="312" font-size="11">🔑↗</text><text x="430" y="312" font-weight="bold" font-style="italic">BookID</text><text x="555" y="312" font-style="italic" fill="#333">char(5)</text>
+<text x="400" y="334" font-size="11">▤</text><text x="430" y="334">Qty</text><text x="555" y="334" fill="#333">integer(11)</text>
+<rect x="390" y="430" width="260" height="140" rx="10" fill="#f2b97a" stroke="#333"/>
+<text x="520.0" y="446" text-anchor="middle" fill="#222">msbook</text><line x1="390" y1="454" x2="650" y2="454" stroke="#333"/>
+<text x="400" y="470" font-size="11">🔑</text><text x="430" y="470" font-weight="bold">BookID</text><text x="555" y="470" fill="#333">char(5)</text>
+<text x="400" y="492" font-size="11">↗</text><text x="430" y="492" font-style="italic">GenreID</text><text x="555" y="492" font-style="italic" fill="#333">char(5)</text>
+<text x="400" y="514" font-size="11">▤</text><text x="430" y="514">BookTitle</text><text x="555" y="514" fill="#333">varchar(50)</text>
+<text x="400" y="536" font-size="11">▤</text><text x="430" y="536">BookPrice</text><text x="555" y="536" fill="#333">float</text>
+<text x="400" y="558" font-size="11">▤</text><text x="430" y="558">BookStock</text><text x="555" y="558" fill="#333">integer(11)</text>
+<rect x="740" y="430" width="260" height="74" rx="10" fill="#f2b97a" stroke="#333"/>
+<text x="870.0" y="446" text-anchor="middle" fill="#222">msgenre</text><line x1="740" y1="454" x2="1000" y2="454" stroke="#333"/>
+<text x="750" y="470" font-size="11">🔑</text><text x="780" y="470" font-weight="bold">GenreID</text><text x="905" y="470" fill="#333">char(5)</text>
+<text x="750" y="492" font-size="11">▤</text><text x="780" y="492">GenreName</text><text x="905" y="492" fill="#333">varchar(50)</text>
+</svg>

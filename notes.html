@@ -1,0 +1,106 @@
+<!doctype html>
+<!-- COMP6799 MySQL: must-know + traps -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SQL Notes</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#1d2330;--mute:#6b7280;--line:#e3e6eb;--acc:#2f5bea;--bad:#c62828;--code:#f1f3f6}
+@media (prefers-color-scheme:dark){:root{--bg:#14161b;--panel:#1c1f26;--ink:#e6e8ec;--mute:#9aa1ad;--line:#2c313b;--acc:#7c9cff;--bad:#f87171;--code:#232733}}
+body{margin:0;font:15px/1.6 -apple-system,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:900px;margin:0 auto;padding:24px 16px 60px}a{color:var(--acc)}
+h1{font-size:24px}h2{font-size:18px;margin-top:32px;border-bottom:1px solid var(--line);padding-bottom:4px}
+pre,code{font-family:ui-monospace,Menlo,monospace;font-size:13px}pre{background:var(--code);padding:12px;border-radius:8px;overflow:auto}
+code{background:var(--code);padding:1px 4px;border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0}td,th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.trap li{margin:6px 0}.trap b{color:var(--bad)}
+</style></head><body><main>
+<p><a href="./">← back to the quiz</a></p>
+<h1>COMP6799 MySQL — must know</h1>
+
+<h2>1. Write order vs run order</h2>
+<pre>SELECT   cols / expressions AS alias      -- 5th
+FROM     table t JOIN other o ON t.id = o.id  -- 1st
+WHERE    row filter (no COUNT/SUM here)  -- 2nd
+GROUP BY non-aggregated columns          -- 3rd
+HAVING   group filter (COUNT/SUM allowed) -- 4th
+ORDER BY col DESC, col2 ASC              -- 6th
+LIMIT    n;                              -- 7th</pre>
+
+<h2>2. DDL — structure</h2>
+<pre>CREATE DATABASE hehe_groceries;   USE hehe_groceries;   DROP DATABASE hehe_groceries;
+
+CREATE TABLE MsProduct (
+  ProductID    CHAR(5) PRIMARY KEY CHECK (ProductID REGEXP '^PR[0-9]{3}$'),
+  CategoryID   CHAR(5) NOT NULL,
+  ProductName  VARCHAR(50) NOT NULL,
+  ProductPrice INT NOT NULL,
+  FOREIGN KEY (CategoryID) REFERENCES MsCategory(CategoryID)
+    ON UPDATE CASCADE ON DELETE CASCADE
+);
+-- composite key:  PRIMARY KEY (TransactionID, ProductID)
+-- value rule:     Quantity INT NOT NULL CHECK (Quantity > 0)
+
+DROP TABLE MsBrand;
+ALTER TABLE MsCustomer ADD CustomerPhone VARCHAR(50);
+ALTER TABLE MsCustomer ADD CONSTRAINT check_phonenumber CHECK (CustomerPhone REGEXP '^[0-9]+$');
+ALTER TABLE MsCustomer DROP CONSTRAINT check_phonenumber;
+ALTER TABLE MsEmployee MODIFY EmployeeAddress VARCHAR(100) NOT NULL;   -- change type
+ALTER TABLE MsEmployee CHANGE EmployeeAddress Address VARCHAR(100);    -- rename + type
+ALTER TABLE MsEmployee DROP COLUMN EmployeeGender;
+ALTER TABLE MsBrand RENAME TO MsMerk;
+
+CREATE VIEW v AS SELECT ...;          DROP VIEW v;      DROP VIEW IF EXISTS a, b;
+CREATE INDEX idx_productname ON MsProduct(ProductName);
+CREATE UNIQUE INDEX idx_detail ON TransactionDetail(TransactionID, ProductID);
+DROP INDEX idx_productname ON MsProduct;          -- needs "ON table"
+CREATE TEMPORARY TABLE t AS SELECT ...;           -- gone when the session ends</pre>
+
+<h2>3. DML — data</h2>
+<pre>INSERT INTO MsEmployee VALUES ('EM016','Clem','Male','0975 Forest Dale Trail'), ('EM017', ...);
+INSERT INTO TransactionDetail (TransactionID, ProductID, Quantity) VALUES ('TR001','PR014',27);
+UPDATE MsProduct SET ProductPrice = ProductPrice - 2 WHERE ProductPrice > 10;
+UPDATE MsProduct SET ProductStock = ProductStock + 10
+  WHERE CategoryID IN (SELECT CategoryID FROM MsCategory WHERE CategoryName = 'Fruit');
+DELETE FROM TransactionHeader WHERE TransactionID IN ('TR001','TR003','TR005');
+
+START TRANSACTION;  ... ;  ROLLBACK;   -- undo      (or COMMIT; to keep)</pre>
+
+<h2>4. DCL — users</h2>
+<pre>CREATE USER 'budi'@'localhost' IDENTIFIED BY 'pass';
+GRANT SELECT, INSERT ON hehe_groceries.* TO 'budi'@'localhost';
+REVOKE INSERT ON hehe_groceries.* FROM 'budi'@'localhost';</pre>
+
+<h2>5. Functions</h2>
+<table>
+<tr><th>String</th><td><code>CONCAT(a,b,…)</code> · <code>UPPER/LOWER</code> · <code>LENGTH</code> · <code>LEFT(s,n)</code> · <code>RIGHT(s,n)</code> · <code>SUBSTR(s,start,len)</code> (1-based) · <code>REPLACE(s,from,to)</code> · <code>REVERSE</code> · <code>POSITION(x IN s)</code> = <code>LOCATE(x,s)</code> (0 = not found) · <code>INSERT(s,pos,len,new)</code> (len 0 = insert, len LENGTH(s) = replace the rest) · <code>SUBSTRING_INDEX(s,'@',1 / -1)</code> · <code>TRIM</code> · <code>LPAD(s,n,'0')</code></td></tr>
+<tr><th>Date</th><td><code>YEAR/MONTH/DAY</code> · <code>DAYNAME</code> (Monday) · <code>MONTHNAME</code> (January) · <code>QUARTER</code> · <code>CURDATE()</code> · <code>NOW()</code> · <code>DATE_ADD(d, INTERVAL 7 DAY)</code> · <code>DATE_SUB(d, INTERVAL 1 YEAR)</code> · <code>DATEDIFF(later, earlier)</code> (days) · <code>TIMESTAMPDIFF(YEAR, dob, CURDATE())</code> (age)</td></tr>
+<tr><th>DATE_FORMAT codes</th><td><code>%d</code> 05 · <code>%e</code> 5 · <code>%m</code> 08 · <code>%M</code> August · <code>%b</code> Aug · <code>%Y</code> 2022 · <code>%y</code> 22 · <code>%W</code> Monday — e.g. <code>DATE_FORMAT(d,'%d-%m-%Y')</code> → 05-08-2022</td></tr>
+<tr><th>Number</th><td><code>ROUND(x,2)</code> · <code>CEIL</code> · <code>FLOOR</code> · <code>RAND()</code> (0–1; between 10 and 50: <code>10 + RAND()*40</code>) · <code>x % 2</code> or <code>MOD(x,2)</code> · <code>CAST(s AS UNSIGNED)</code></td></tr>
+<tr><th>Aggregate</th><td><code>COUNT(*)</code> · <code>COUNT(col)</code> (skips NULL) · <code>COUNT(DISTINCT col)</code> · <code>SUM</code> · <code>AVG</code> · <code>MAX</code> · <code>MIN</code> · <code>GROUP_CONCAT(col ORDER BY col SEPARATOR ', ')</code></td></tr>
+<tr><th>Logic</th><td><code>CASE WHEN … THEN … ELSE … END</code> · <code>IF(cond,a,b)</code> · <code>IFNULL(x,'-')</code> · <code>IN (…)</code> · <code>BETWEEN a AND b</code> (both ends included) · <code>LIKE 'A%' / '%a' / '%a%' / '_a%'</code> · <code>REGEXP '^CU[0-9]{3}$'</code> · <code>EXISTS (subquery)</code></td></tr>
+</table>
+
+<h2>6. Traps (each one costs points)</h2>
+<ol class="trap">
+<li><b>Exact text.</b> <code>'Mr.'</code> ≠ <code>'Mr. '</code>. The grader compares strings character by character. Copy the spaces and punctuation from the example.</li>
+<li><b>NOT NULL + CHECK on a table with rows.</b> <code>ADD CustomerPhone VARCHAR(50) NOT NULL</code> fills old rows with <code>''</code>; then <code>CHECK (… REGEXP '^[0-9]+$')</code> fails with error 4025 (tested on this MariaDB). Add the column nullable, then the constraint.</li>
+<li><b>Aggregate in WHERE.</b> <code>WHERE COUNT(*) &gt; 10</code> is an error. Use <code>HAVING</code>.</li>
+<li><b>GROUP BY.</b> Every SELECT column that is not inside COUNT/SUM/… must be in GROUP BY.</li>
+<li><b>LEFT JOIN + COUNT(*).</b> An employee with 0 transactions gets 1. Use <code>COUNT(th.TransactionID)</code>.</li>
+<li><b>LIMIT 1 for "the most".</b> Ties disappear. Use <code>HAVING COUNT(*) = (SELECT MAX(...) FROM (...) AS x)</code>.</li>
+<li><b>Derived tables need an alias:</b> <code>FROM (SELECT …) AS x</code>.</li>
+<li><b>LIKE without %</b> means an exact match. <code>LIKE '%Cheese'</code> = ends with; <code>'Cheese%'</code> = starts with.</li>
+<li><b>Last word / first word.</b> Last: <code>RIGHT(s, POSITION(' ' IN REVERSE(s)) - 1)</code>. First: <code>LEFT(s, POSITION(' ' IN s) - 1)</code>. Forgetting <code>- 1</code> keeps the space.</li>
+<li><b>Replace after '@'</b>: <code>INSERT(email, POSITION('@' IN email) + 1, LENGTH(email), 'gmail.com')</code>. Add before '@': <code>INSERT(email, LOCATE('@', email), 0, 'lady')</code>.</li>
+<li><b>Even/odd ID</b>: <code>CAST(RIGHT(TransactionID, 3) AS UNSIGNED) % 2 = 0</code>.</li>
+<li><b>Alias with a space</b> needs backticks: <code>AS `Transaction Count`</code>. Strings use single quotes. An alias cannot be used in WHERE (it can in ORDER BY and HAVING).</li>
+<li><b>NULL</b>: write <code>IS NULL</code> / <code>IS NOT NULL</code>, never <code>= NULL</code>.</li>
+<li><b>ON DELETE CASCADE</b>: deleting TR001 from TransactionHeader also deletes its TransactionDetail rows.</li>
+<li><b>UNION</b> removes duplicate rows; <code>UNION ALL</code> keeps them. Both parts need the same number of columns in the same order.</li>
+<li><b>DISTINCT</b> works on the whole row, not one column. "Duplicates counted once" inside a count = <code>COUNT(DISTINCT …)</code>.</li>
+<li><b>INTERVAL</b> uses singular units: <code>INTERVAL 1 YEAR</code>, <code>INTERVAL 7 DAY</code>.</li>
+<li><b>DROP INDEX</b> needs <code>ON table</code>. <code>DROP VIEW IF EXISTS a, b</code> drops two at once.</li>
+<li><b>GROUP_CONCAT</b> separates with <code>,</code> (no space) unless you write <code>SEPARATOR ', '</code>.</li>
+<li><b>Table name case</b>: Mac and Windows ignore it, Linux does not. Write the exact case from the question.</li>
+<li><b>Run order</b> in a script: create parents (MsCategory, MsCustomer, MsEmployee) before children (MsProduct, TransactionHeader, TransactionDetail); drop children first.</li>
+</ol>
+</main></body></html>
